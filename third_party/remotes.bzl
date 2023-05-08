@@ -1,0 +1,1 @@
+THIRD_PARTY_RESOURCES = "http://127.0.0.1"
