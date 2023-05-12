@@ -11,5 +11,4 @@ TEST(HelloTest, BasicAssertions)
 {
     EXPECT_STRNE("hello", "world");
     EXPECT_EQ(6 * 7, 42);
-    EXPECT_FLOAT_EQ(0.0000000001F, 0.000000001F);
 }

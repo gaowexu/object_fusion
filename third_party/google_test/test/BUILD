@@ -7,7 +7,7 @@ cc_test(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@com_google_googletest//:gtest",
-        "@com_google_googletest//:gtest_main",
+        "//third_party/google_test:gtest_main",
+        "//third_party/google_test:gtest",
     ],
 )

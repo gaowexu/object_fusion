@@ -23,18 +23,125 @@ In this repository, we formulate the Kalman process using LiDAR 3D object detect
 
 ### 3. Bazel Build & Unit Test
 
-#### 3.1 Virtual Third-Party Packages Server Setup
-Firstly launch an ECS instance of AliCloud 
+#### 3.1 Install Bazel
+Firstly launch an ECS instance `ecs.s6-c1m4.xlarge` in [aliyun](https://ecs-buy.aliyun.com/) and choose `Ubuntu 20.04 64-bit` as operating system image. Wait minutes and login the ECS server via ssh.
 
-
-#### 3.2 Build & Test of Third-Party Packages
-
-
-#### 3.3 Build & Unit Test of Object Fusion SDK
-
+After successfully login to the ECS server, please run the following commands:
 ```
-bazel test --test_output=all //modules/test:object_fusion_unit_test
+sudo apt-get update
+sudo apt-get upgrade
 ```
+
+Following the user guide to install [bazel](https://bazel.build/install/ubuntu?hl=zh-cn) in Ubuntu 20.04:
+```
+sudo apt install g++ unzip zip
+```
+Download [bazel installion script](https://github.com/bazelbuild/bazel/releases):
+```
+wget -c https://github.com/bazelbuild/bazel/releases/download/6.2.0/bazel-6.2.0-installer-linux-x86_64.sh
+chmod a+x bazel-6.2.0-installer-linux-x86_64.sh
+./bazel-6.2.0-installer-linux-x86_64.sh --user
+export PATH="$PATH:$HOME/bin"
+```
+
+Then run command ```bazel --version```, it will display the below message in terminal:
+```
+root@iZbp19iv7rc5oi5ssvezt5Z:~# bazel --version
+bazel 6.2.0
+```
+
+#### 3.2 Virtual Third-Party Packages Server Setup
+In order to simulate the third-party packages server, we use the local ECS machine as server, we firstly install apache to play as the role of this-party dependencies server.
+```
+sudo apt-get install apache2
+```
+
+Upload this repo to the ECS and copy third-party dependencies to `/var/www/html/` directory:
+```
+cd assets
+sudo cp * /var/www/html/.
+```
+
+#### 3.3 Build & Test of Third-Party Packages
+> bazel build //third_party/google_test:gtest
+
+The running result is shown below:
+```
+root@iZbp19iv7rc5oi5ssvezt5Z:~/object_fusion# bazel build //third_party/google_test:gtest
+INFO: Analyzed target //third_party/google_test:gtest (2 packages loaded, 55 targets configured).
+INFO: Found 1 target...
+Target @google_test//:gtest up-to-date:
+  bazel-bin/external/google_test/libgtest.a
+  bazel-bin/external/google_test/libgtest.so
+INFO: Elapsed time: 7.949s, Critical Path: 5.47s
+INFO: 18 processes: 3 internal, 15 linux-sandbox.
+INFO: Build completed successfully, 18 total actions
+```
+
+> bazel build //third_party/google_test:gtest_main
+
+The running result is shown below:
+```
+root@iZbp19iv7rc5oi5ssvezt5Z:~/object_fusion# bazel build //third_party/google_test:gtest_main
+INFO: Analyzed target //third_party/google_test:gtest_main (0 packages loaded, 3 targets configured).
+INFO: Found 1 target...
+Target @google_test//:gtest_main up-to-date:
+  bazel-bin/external/google_test/libgtest_main.a
+  bazel-bin/external/google_test/libgtest_main.so
+INFO: Elapsed time: 1.342s, Critical Path: 1.14s
+INFO: 6 processes: 3 internal, 3 linux-sandbox.
+INFO: Build completed successfully, 6 total actions
+```
+
+> bazel test //third_party/google_test/test:gtest_unit_test --test_output=all
+
+The running result is shown below:
+```
+root@iZbp19iv7rc5oi5ssvezt5Z:~/object_fusion# bazel test //third_party/google_test/test:gtest_unit_test --test_output=all
+INFO: Analyzed target //third_party/google_test/test:gtest_unit_test (0 packages loaded, 0 targets configured).
+INFO: Found 1 test target...
+INFO: From Testing //third_party/google_test/test:gtest_unit_test:
+==================== Test output for //third_party/google_test/test:gtest_unit_test:
+Running main() from gmock_main.cc
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from HelloTest
+[ RUN      ] HelloTest.BasicAssertions
+[       OK ] HelloTest.BasicAssertions (0 ms)
+[----------] 1 test from HelloTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+================================================================================
+Target //third_party/google_test/test:gtest_unit_test up-to-date:
+  bazel-bin/third_party/google_test/test/gtest_unit_test
+INFO: Elapsed time: 1.181s, Critical Path: 1.02s
+INFO: 4 processes: 1 internal, 3 linux-sandbox.
+INFO: Build completed successfully, 4 total actions
+//third_party/google_test/test:gtest_unit_test                           PASSED in 0.1s
+```
+
+
+
+Eigen build:
+> bazel build //third_party/eigen:eigen
+
+The running result is shown below:
+```
+root@iZbp19iv7rc5oi5ssvezt5Z:~/object_fusion# bazel build //third_party/eigen:eigen
+INFO: Analyzed target //third_party/eigen:eigen (6 packages loaded, 788 targets configured).
+INFO: Found 1 target...
+Target @eigen//:eigen up-to-date (nothing to build)
+INFO: Elapsed time: 2.353s, Critical Path: 0.05s
+INFO: 1 process: 1 internal.
+INFO: Build completed successfully, 1 total action
+```
+
+
+#### 3.4 Build & Unit Test of Object Fusion SDK
+
+> bazel test --test_output=all //modules/test:object_fusion_unit_test
 
 ```
 INFO: Analyzed target //modules/test:object_fusion_unit_test (0 packages loaded, 0 targets configured).
@@ -62,7 +169,6 @@ Running main() from gmock_main.cc
 //modules/test:object_fusion_unit_test                          (cached) PASSED in 0.4s
 
 INFO: Build completed successfully, 3 total actions
-
 ```
 
 ### 4. Liscene
@@ -85,3 +191,5 @@ INFO: Build completed successfully, 3 total actions
 [6] Li, Yangguang, et al. "Fast-BEV: A Fast and Strong Bird's-Eye View Perception Baseline." arXiv preprint arXiv:2301.12511 (2023).
 
 [7] http://www.columbia.edu/~cs2035/courses/ieor6614.S16/GolinAssignmentNotes.pdf
+
+[8] Bazel user guide: https://bazel.build/?hl=zh-cn
