@@ -171,9 +171,8 @@ Running main() from gmock_main.cc
 INFO: Build completed successfully, 3 total actions
 ```
 
-### 4. Liscene
-
-
+### 4. Copyright
+*Copyright (C) 2022-2026 Gaowei Xu (gaowexu1991@gmail.com)*
 
 
 ### 5. Reference
