@@ -5,24 +5,26 @@
 
 ### 1. Introduction
 
-In this repository, a typical object fusion SDK is implemented with C++/Bazel toolchain. It exploites linear kalman process for object prediction and fusion. For fusion part, L2 eucidean distance and intersection over union (IoU) are both applied. This SDK could be applied or generalized for multi-sensor object fusion in highway scenarios (such as NOP, LCC, LKA, ACC). In this reposity, the following features are supported:
+In this repository, a typical object fusion SDK based on C++ is implemented and it uses the Bazel toolchain for compilation and unit testing. The core of this repository exploits the linear Kalman model to predict and fuse the motion state of the detected objects (from LiDAR 3D detection module[1-3] or BEV visual 3D detection module[4-6], etc.). For association part, both Euclidean distance and intersection-over-union (IoU) metrics are applied to measure the distance between objects. This SDK can be used or generalized for multi-sensor object fusion in highway scenarios (such as NOP, LCC, LKA, ACC). In this repository, the following features are supported:
 
-[x] Kalman process C++ implementation.
+- Kalman process C++ implementation.
 
-[x] Objects association with Munkres algorithm.
+- Objects association with Munkres algorithm[7].
 
-[x] Bazel build and unit test for each module of object fusion SDK.
+- Bazel build and unit test for each module of object fusion SDK.
+- User guide for how to setup bazel toolchain from scratch.
 
 
 ### 2. Kalman & Object Fusion
 
 ![Architecture_Of_Object_Fusion](./assets/architect.png)
 
-In this repository, we take LiDAR object detection (single channel sensor input) as example, to formulate the Kalman process. Firstly, the LiDAR detected 3D objects are convert to odometry cooridnate system from ego vehicle rear axis coordinate system. Then Kalman prediction, agents association, state fusion (including create new tracks) are cascaded. Finally, these fused objects (optimal estimation) are transformed back to ego vehicle rear axis coordinate system and published via ROS message.
+In this repository, we formulate the Kalman process using LiDAR 3D object detection (single sensor input) as an example. First, the 3D objects detected by the lidar are transformed from the ego-vehicle-rear-axis coordinate system to the odometry coordinate system. Then Kalman prediction, agent association, state fusion (including creation of new tracks) are cascaded. Finally, these fused objects (i.e., optimal estimations) are transformed back to the ego-vehicle-rear-axis coordinate system and published via ROS messages.
 
 ### 3. Bazel Build & Unit Test
 
 #### 3.1 Virtual Third-Party Packages Server Setup
+Firstly launch an ECS instance of AliCloud 
 
 
 #### 3.2 Build & Test of Third-Party Packages
@@ -70,4 +72,16 @@ INFO: Build completed successfully, 3 total actions
 
 ### 5. Reference
 
+[1] Yin, Tianwei, Xingyi Zhou, and Philipp Krahenbuhl. "Center-based 3d object detection and tracking." Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2021.
 
+[2] Lang, Alex H., et al. "Pointpillars: Fast encoders for object detection from point clouds." Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2019.
+
+[3] Liu, Zhijian, et al. "BEVFusion: Multi-Task Multi-Sensor Fusion with Unified Bird's-Eye View Representation." arXiv preprint arXiv:2205.13542 (2022).
+
+[4] Huang J, Huang G, Zhu Z, et al. BEVDet: High-performance Multi-camera 3D Object Detection in Bird-Eye-View[J]. arXiv e-prints, 2021: arXiv: 2112.11790.
+
+[5] Li Y, Ge Z, Yu G, et al. BEVDepth: Acquisition of Reliable Depth for Multi-view 3D Object Detection[J]. arXiv e-prints, 2022: arXiv: 2206.10092.
+
+[6] Li, Yangguang, et al. "Fast-BEV: A Fast and Strong Bird's-Eye View Perception Baseline." arXiv preprint arXiv:2301.12511 (2023).
+
+[7] http://www.columbia.edu/~cs2035/courses/ieor6614.S16/GolinAssignmentNotes.pdf
